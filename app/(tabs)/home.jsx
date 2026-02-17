@@ -1,15 +1,22 @@
 import { BlurView } from 'expo-blur';
-import React from 'react';
+import { useRouter } from 'expo-router';
+import { collection, getDocs, query } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, ImageBackground, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import logo from "../../assets/images/dinetimelogo.png";
 import banner from "../../assets/images/homeBanner.png";
-import restaurants from "../../store/restaurants";
+import { db } from "../../config/firebaseConfig";
 
 const Home = () => {
+  const router = useRouter();
+ const [restaurants, setRestaurants] = useState([])
   
    const renderItem = ({item})=>( 
-    <TouchableOpacity className="bg-[#5f5f5f] max-h-64 max-w-xs flex justify-center rounded-lg p-4 mx-4 shadow-md">
+    <TouchableOpacity
+    onPress={() => router.push(`/restaurant/${item.name}`)}
+    //  onPress={()=>router.push(`/restaurant/f${item.name}`)} 
+    className="bg-[#5f5f5f] max-h-64 max-w-xs flex justify-center rounded-lg p-4 mx-4 shadow-md">
       <Image resizeMode='cover' source={{uri:item.image}}
        className='h-28 mt-2 mb-1 rounded-lg'
       />
@@ -19,6 +26,19 @@ const Home = () => {
     </TouchableOpacity>
 
    );
+
+   const getRestaurants = async () => {
+    const q = query(collection(db, "restaurants"));
+    const res = await getDocs(q);
+
+    res.forEach((item) => {
+      setRestaurants((prev) => [...prev, item.data()]);
+    });
+  };
+  useEffect(() => {
+    getRestaurants();
+    
+  }, []);
   return (
    <SafeAreaView style={[{backgroundColor:"#2b2b2b"}, Platform.OS==="android"&&{paddingBottom:40}]}>
     <View className='flex items-center '>
