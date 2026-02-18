@@ -1,7 +1,10 @@
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from 'expo-router';
+import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import { doc, getFirestore, setDoc } from 'firebase/firestore';
 import { Formik } from 'formik';
 import { TextInput } from 'react-native';
 import logo from "../../assets/images/dinetimelogo.png";
@@ -13,8 +16,42 @@ const entryImg = require("../../assets/images/Frame.png")
 
 const Signup = () => {
     const router = useRouter();
-    const handleSignup = () => {
+    const auth = getAuth();
+    const db = getFirestore();
+    const handleGuest= async () =>{ 
+     await AsyncStorage.setItem("isGuest","true")
+     router.push("/home")
+  }
+    const handleSignup =  async(values) => {
+        try {
+            const userCredentials = await createUserWithEmailAndPassword(
+                auth,values.email,values.password
+            )
+            const user= userCredentials.user;
 
+            await setDoc(doc(db,"users",user.uid),{
+                email:values.email,
+                createdAt:new Date(),
+            })
+            await AsyncStorage.setItem("userEmail", values.email)
+            await AsyncStorage.setItem("isGuest","false")
+
+               router.push("/home")
+        
+
+        } catch (error) {
+           if(error.code==="auth/email-already-in-use"){
+            Alert.alert("Signup Failed!",
+                "This email address is already in use. use different email",[{text:"OK"}]
+            )
+           }
+           else {
+            Alert.alert("Signup Error",
+                "Unexpected error",[{text:"OK"}]
+            )
+           }
+            
+        }
     }
     return (
         <SafeAreaView className={`bg-[#2b2b2b]`}>
@@ -74,7 +111,7 @@ const Signup = () => {
                <View className="border-b-2 border-[#f49b33] p-2 mb-1 w-24" /> or {" "}
                 <View className="border-b-2 border-[#f49b33] p-2 mb-1 w-24" />
             </Text>
-             <TouchableOpacity className="flex flex-row justify-center mb-5 p-2 items-center" onPress={() => router.push("/home")}>
+             <TouchableOpacity className="flex flex-row justify-center mb-5 p-2 items-center" onPress={handleGuest}>
                                 <Text className="text-white font-semibold">
                                     Be a 
                                 </Text>

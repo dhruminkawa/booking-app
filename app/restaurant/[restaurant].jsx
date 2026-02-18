@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Dimensions, FlatList, Image, Linking, Platform, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DatePickerComponent from '../../components/restaurant/DatePickerComponent';
+import FindSlots from '../../components/restaurant/FindSlots';
 import GuestPickerComponent from '../../components/restaurant/GuestPickerComponent';
 import { db } from '../../config/firebaseConfig';
 
@@ -15,9 +16,12 @@ const Restaurant = () => {
  const [currentIndex,setCurrentIndex] = useState(0);
   const [restaurantData, setRestaurantData] = useState({});
   const [carouselData, setCarouselData] = useState({});
-    const [selectedNumber, setSelectedNumber] = useState()
-    const [date,setDate] = useState(new Date());
+   
   const [slotsData, setSlotsData] = useState({});
+  const [selectedSlot,setSelectedSlot]= useState(null)
+  const [selectedNumber, setSelectedNumber] = useState(1)
+      const [date,setDate] = useState(new Date());
+
   const handleNextImage=()=>{
     const carousellength= carouselData[0]?.images.length;
     if(currentIndex < carousellength - 1){
@@ -126,7 +130,7 @@ const Restaurant = () => {
         slotsSnapshot.forEach((slotDoc)=>{
           slots.push(slotDoc.data());
         })
-        setSlotsData(slots)
+        setSlotsData(slots[0]?.slot)
       }
 
 
@@ -149,7 +153,7 @@ const Restaurant = () => {
    useEffect(() =>{
      getRestaurantData();
    }, [])
-   console.log(restaurantData,carouselData,slotsData)
+   
   return (
     <SafeAreaView
        style={[
@@ -198,27 +202,36 @@ const Restaurant = () => {
               
               </Text>
        </View>
-       <View>
+       <View className="flex-1 border m-2 p-2 border-[#f49b33] rounded-lg" > 
 
        
        <View className=" flex-1 flex-row m-2 p-2  justify-end items-center">
         <View className="flex-1 flex-row">
           <Ionicons name='calendar' size={20} color="#f49b33" />
           <Text className="text-white mx-2">
-            Select bookingdate
+            Select booking date
           </Text>
         </View>
         <DatePickerComponent date={date} setDate={setDate} />
         </View>
-        <View className=" flex-1 flex-row m-2 p-2  justify-end items-center">
+        <View className=" flex-1 bg-[#474747] rounded-lg flex-row m-2 p-2  justify-end items-center">
         <View className="flex-1 flex-row">
-          <Ionicons name='calendar' size={20} color="#f49b33" />
+          <Ionicons name='people' size={20} color="#f49b33" />
           <Text className="text-white mx-2">
             Select number of guests
           </Text>
         </View>
-        <GuestPickerComponent SelectedNumber={selectedNumber} setSelectedNumber={setSelectedNumber} />
+        <GuestPickerComponent selectedNumber={selectedNumber} setSelectedNumber={setSelectedNumber} />
         </View>
+       </View>
+       <View className="flex-1">
+         <FindSlots 
+         restaurant={restaurant}
+         slots={slotsData} 
+         selectedSlot={selectedSlot} 
+         setSelectedSlot={setSelectedSlot}
+         date={date} 
+         selectedNumber={selectedNumber} />        
        </View>
       </ScrollView>
     </SafeAreaView>

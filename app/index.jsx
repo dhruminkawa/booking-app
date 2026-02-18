@@ -1,11 +1,16 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from "expo-router";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import logo from "../assets/images/dinetimelogo.png";
-
 const entryImg = require("../assets/images/Frame.png")
 export default function Index() {
   const router = useRouter();
+
+  const handleGuest= async () =>{
+     await AsyncStorage.setItem("isGuest","true")
+     router.push("/home")
+  }
   return (
     <SafeAreaView className={`bg-[#2b2b2b]`}>
       <ScrollView contentContainerStyle={{height:"100%"}}>
@@ -17,7 +22,7 @@ export default function Index() {
                 Sign Up
               </Text>
             </TouchableOpacity >
-             <TouchableOpacity onPress={()=>router.push("/home")} className="p-2 my-2 bg-[#2b2b2b] border border-[#f49b33] text-black rounded-lg">
+             <TouchableOpacity onPress={handleGuest} className="p-2 my-2 bg-[#2b2b2b] border border-[#f49b33] text-black rounded-lg">
               <Text className="text-lg text-[#f49b33] font-semibold text-center">
                 Guest User
               </Text>

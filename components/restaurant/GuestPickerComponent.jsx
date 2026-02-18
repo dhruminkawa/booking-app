@@ -10,7 +10,7 @@ const GuestPickerComponent = ({selectedNumber,setSelectedNumber}) => {
          setSelectedNumber(selectedNumber+1)
     }
   return (
-    <View className="flex flex-row item-center rounded-lg text-white text-base">
+    <View className="flex flex-row items-center rounded-lg text-white text-base">
         <TouchableOpacity onPress={decrement} 
         className="rounded">
           <Text className="text-white text-lg border border-[#f49b33] rounded-l-lg px-3">-</Text>
